@@ -1,0 +1,84 @@
+<project name="robust" basedir="." default="jar">
+	<property name="build" value="build"/>
+	<property file="build.properties"/>
+	<property name="libs.dir" value="lib"/>
+	<property name="src.pc.dir" value="srcpc"/>
+	<property name="src.nxt.dir" value="srcnxt"/>
+
+
+  <property name="libs.urls.xstream" value="http://mirrors.ibiblio.org/pub/mirrors/maven2/com/thoughtworks/xstream/xstream/1.3.1/xstream-1.3.1.jar"/>
+  <property name="libs.urls.log4j" value="http://archive.apache.org/dist/logging/log4j/1.2.15/apache-log4j-1.2.15.zip"/>
+	<property name="libs.urls.bluecove" value="http://heanet.dl.sourceforge.net/project/bluecove/BlueCove/2.1.0/bluecove-2.1.0.jar"/>
+	<property name="libs.urls.lejos" value="http://surfnet.dl.sourceforge.net/project/lejos/lejos-NXJ/0.8.5beta/lejos_NXJ_0_8_5beta.tar.gz"/>	
+	<property name="version" value="0.1"/>
+	
+	<target name="clean">
+		<delete dir="${build}"/>
+		<delete dir="${libs.dir}"/>
+		<delete file="robustcfg.xml"/>
+		<delete file="log4j.properties"/>		
+	</target>
+
+	<target name="init" depends="clean">
+		<mkdir dir="${build}"/>
+		<mkdir dir="${libs.dir}"/>
+		<copy todir=".">
+		   <fileset dir="${src.pc.dir}" includes="log4j.properties"/>
+		   <fileset dir="${src.pc.dir}" includes="robustcfg.xml"/>
+		</copy>		
+	</target>
+	
+	<target name="libs">
+		  <get src="${libs.urls.xstream}" dest="${libs.dir}/xstream-1.3.1.jar"/>
+		  <get src="${libs.urls.log4j}" dest="${libs.dir}/apache-log4j-1.2.15.zip"/>
+		  <unzip src="${libs.dir}/apache-log4j-1.2.15.zip" dest="${libs.dir}"/>
+		  <copy todir="${libs.dir}">
+		    <fileset dir="${libs.dir}/apache-log4j-1.2.15" includes="**/*.jar"/>
+		  </copy>
+		  <delete dir="${libs.dir}/apache-log4j-1.2.15"/>
+		  <get src="${libs.urls.bluecove}" dest="${libs.dir}/bluecove-2.1.0.jar"/>	
+		  <get src="${libs.urls.lejos}" dest="${libs.dir}/lejos_NXJ_0_8_0beta.tar.gz"/> 
+		  <gunzip src="${libs.dir}/lejos_NXJ_0_8_0beta.tar.gz"/>
+	      <untar src="${libs.dir}/lejos_NXJ_0_8_0beta.tar" dest="${libs.dir}"/>
+		  <copy todir="${libs.dir}">
+		    <fileset dir="${libs.dir}/lejos_nxj/lib"  includes="**/*.jar"/>
+		  </copy>
+		  <delete dir="${libs.dir}/lejos_nxj"/>
+		  <delete>
+		    <fileset dir="${libs.dir}" includes="**/*.zip"  />
+		  	<fileset dir="${libs.dir}" includes="**/*.tar"  />
+		    <fileset dir="${libs.dir}" includes="**/*.gz"  />
+		  </delete>
+    </target>
+	
+	<!-- 
+	TODO make this task working
+	<target name="bldnxt" depends="init">
+		<exec executable="nxjc" dir="${src.nxt.dir}">
+		    <arg value="*.java"/>
+		</exec>
+		<exec executable="nxjlink" dir="${src.nxt.dir}">
+			<arg value="-o RobustNXT.nxj RobustNXT"/>
+		</exec>
+		<move todir="${build}">
+		    <fileset dir="${src.nxt.dir}"  includes="**/*.nxj"/>
+		</move>		
+	</target>
+    -->
+	
+	<target name="compile" depends="init, libs">
+		<javac srcdir="${src.pc.dir}" destdir="${build}">
+			<classpath>
+				<pathelement location="${libs.dir}/xstream-1.3.1.jar"/>
+				<pathelement location="${libs.dir}/bluecove-2.1.0.jar"/>
+				<pathelement location="${libs.dir}/log4j-1.2.15.jar"/>
+			    <pathelement location="${libs.dir}/pccomm.jar"/>
+			</classpath>
+		</javac>
+	</target>
+	
+	<target name="jar" depends="compile">
+		<jar basedir="${build}" destfile="${build}/robustpc.jar"/>
+	</target>
+	
+</project>

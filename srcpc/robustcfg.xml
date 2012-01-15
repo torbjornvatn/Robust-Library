@@ -1,0 +1,9 @@
+<RobustConfiguration>
+  <robustFactory>robust.pc.impl.nxt.NXTRobustFactory</robustFactory>
+  <hardwareArchitecture>NXT</hardwareArchitecture>
+  <hardwareAddress>00:16:53:03:04:E5</hardwareAddress>
+  <hardwareTransport>BT</hardwareTransport>
+  <unitScale200>410.0</unitScale200>
+  <distanceBetweenWheels>126</distanceBetweenWheels>
+  <usonicUnitScale>9.52</usonicUnitScale>
+</RobustConfiguration>
